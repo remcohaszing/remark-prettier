@@ -1,0 +1,12 @@
+root: true
+extends:
+  - remcohaszing
+  - remcohaszing/jest
+rules:
+  func-style: off
+  '@typescript-eslint/no-invalid-this': off
+  import/no-extraneous-dependencies: off
+overrides:
+  - files: ['**/*.md/**/*.js']
+    rules:
+      node/no-extraneous-import: off
