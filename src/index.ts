@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import * as toMarkdown from 'mdast-util-to-markdown';
 import { format, getFileInfo, Options, resolveConfig } from 'prettier';
 import { generateDifferences, showInvisibles } from 'prettier-linter-helpers';
-import { Attacher } from 'unified';
+import { Plugin } from 'unified';
 import { Point } from 'unist';
 import { VFile } from 'vfile';
 
@@ -35,9 +35,11 @@ function getPointFromOffset(text: string, offset: number): Point {
  *
  * This also registered a compiler for compiling the AST to markdown.
  */
-const remarkPrettier: Attacher<
-  [remarkPrettier.RemarkPrettierOptions?, Options?]
-> = function remarkPrettier({ format: enableFormat = true, report = true } = {}, options = {}) {
+const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function remarkPrettier({
+  format: enableFormat = true,
+  report = true,
+  options = {},
+} = {}) {
   /**
    * Get Prettier options for a file.
    *
@@ -117,6 +119,14 @@ declare namespace remarkPrettier {
      * @default true
      */
     format?: boolean;
+
+    /**
+     * Additional Prettier options.
+     *
+     * These options will override the values in `.editorconfig` and `.prettierrc`. It’s typically
+     * not recommended to use this.
+     */
+    options?: Options;
 
     /**
      * Whether or not to report Prettier formatting violations.

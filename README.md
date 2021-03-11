@@ -3,7 +3,7 @@
 [![github actions][github actions badge]][github actions] [![codecov][codecov badge]][codecov]
 [![npm][npm badge]][npm] [![prettier][prettier badge]][prettier] [![jest][jest badge]][jest]
 
-> Format markdown and MDX using Prettier as a [remark][] plugin
+> Check and format markdown using Prettier as a [remark][] plugin
 
 ## Installation
 

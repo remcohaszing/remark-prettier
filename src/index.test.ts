@@ -177,3 +177,21 @@ it('should use the prettier markdown parser for unknown file extensions', async 
     },
   ]);
 });
+
+it('should support custom prettier options', async () => {
+  const result = await remark()
+    .use(remarkPrettier, { options: { endOfLine: 'crlf' } })
+    .process({
+      history: ['test.unknown'],
+      contents: 'Hello world\n',
+    });
+  expect(representMessages(result)).toStrictEqual([
+    {
+      location: { end: { column: null, line: null }, start: { column: 12, line: 1 } },
+      reason: 'Insert `␍`',
+      ruleId: 'insert',
+      source: 'prettier',
+      url: 'https://github.com/remcohaszing/remark-prettier',
+    },
+  ]);
+});
