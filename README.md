@@ -110,7 +110,7 @@ behaviour can be disabled by setting this option to `false`. (Default `true`)
 [eslint-plugin-prettier]: https://github.com/prettier/eslint-plugin-prettier
 [estree]: https://github.com/estree/estree
 [github actions badge]:
-  https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml/badge.svg
+  https://github.com/remcohaszing/remark-prettier/actions/workflows/ci/badge.svg
 [github actions]: https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml
 [jest badge]: https://jestjs.io/img/jest-badge.svg
 [jest]: https://jestjs.io
