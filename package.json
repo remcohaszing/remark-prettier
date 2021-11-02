@@ -33,7 +33,8 @@
   },
   "dependencies": {
     "mdast-util-to-markdown": "^0.6.0",
-    "prettier-linter-helpers": "^1.0.0"
+    "prettier-linter-helpers": "^1.0.0",
+    "vfile-location": "^3.0.0"
   },
   "peerDependencies": {
     "prettier": "^2"

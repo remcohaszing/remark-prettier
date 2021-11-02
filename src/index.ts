@@ -4,29 +4,8 @@ import * as toMarkdown from 'mdast-util-to-markdown';
 import { format, getFileInfo, Options, resolveConfig } from 'prettier';
 import { generateDifferences, showInvisibles } from 'prettier-linter-helpers';
 import { Plugin } from 'unified';
-import { Point } from 'unist';
 import { VFile } from 'vfile';
-
-/**
- * Get a unist point from a text offset.
- *
- * @param text - The text to get a point for.
- * @param offset - The offset to get a point for.
- * @returns The unist point for the given offset.
- */
-function getPointFromOffset(text: string, offset: number): Point {
-  let line = 1;
-  let column = 1;
-  for (let i = 0; i < offset; i += 1) {
-    if (text.charAt(i) === '\n') {
-      line += 1;
-      column = 1;
-    } else {
-      column += 1;
-    }
-  }
-  return { line, column };
-}
+import * as location from 'vfile-location';
 
 /**
  * A remark plugin for linting and formatting files using Prettier.
@@ -82,17 +61,18 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
         // The file is ignored.
         return;
       }
-      const original = file.contents as string;
+      const original = String(file);
       const formatted = format(original, prettierOptions);
       if (original === formatted) {
         return;
       }
       const differences = generateDifferences(original, formatted);
+      const { toPoint } = location(file);
 
       for (const { deleteText = '', insertText = '', offset, operation } of differences) {
         const position = {
-          start: getPointFromOffset(original, offset),
-          end: getPointFromOffset(original, offset + deleteText.length),
+          start: toPoint(offset),
+          end: toPoint(offset + deleteText.length),
         };
 
         const toDelete = `\`${showInvisibles(deleteText)}\``;

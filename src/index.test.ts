@@ -17,7 +17,10 @@ it('should report prettier diff deletions', async () => {
   const result = await remark().use(remarkPrettier).process('\n\n\n');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: 1, line: 4 }, start: { column: 1, line: 1 } },
+      location: {
+        end: { column: 1, line: 4, offset: 3 },
+        start: { column: 1, line: 1, offset: 0 },
+      },
       reason: 'Delete `⏎⏎⏎`',
       ruleId: 'delete',
       source: 'prettier',
@@ -30,7 +33,7 @@ it('should report prettier diff insertions', async () => {
   const result = await remark().use(remarkPrettier).process('Hello');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: null, line: null }, start: { column: 6, line: 1 } },
+      location: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
       reason: 'Insert `⏎`',
       ruleId: 'insert',
       source: 'prettier',
@@ -43,7 +46,10 @@ it('should report prettier diff replacements', async () => {
   const result = await remark().use(remarkPrettier).process('\n-  foo');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: 7, line: 2 }, start: { column: 1, line: 1 } },
+      location: {
+        end: { column: 7, line: 2, offset: 7 },
+        start: { column: 1, line: 1, offset: 0 },
+      },
       reason: 'Replace `⏎-··foo` with `-·foo⏎`',
       ruleId: 'replace',
       source: 'prettier',
@@ -71,7 +77,10 @@ it('should respect .editorconfig', async () => {
   const result = await remark().use(remarkPrettier).process('X '.repeat(51));
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: 103, line: 1 }, start: { column: 100, line: 1 } },
+      location: {
+        end: { column: 103, line: 1, offset: 102 },
+        start: { column: 100, line: 1, offset: 99 },
+      },
       reason: 'Replace `·X·` with `⏎X⏎`',
       ruleId: 'replace',
       source: 'prettier',
@@ -169,7 +178,10 @@ it('should use the prettier markdown parser for unknown file extensions', async 
     });
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: 1, line: 3 }, start: { column: 1, line: 2 } },
+      location: {
+        end: { column: 1, line: 3, offset: 13 },
+        start: { column: 1, line: 2, offset: 12 },
+      },
       reason: 'Delete `⏎`',
       ruleId: 'delete',
       source: 'prettier',
@@ -187,7 +199,7 @@ it('should support custom prettier options', async () => {
     });
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: null, line: null }, start: { column: 12, line: 1 } },
+      location: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
       reason: 'Insert `␍`',
       ruleId: 'insert',
       source: 'prettier',
