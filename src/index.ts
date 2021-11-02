@@ -89,7 +89,7 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
       }
       const differences = generateDifferences(original, formatted);
 
-      differences.forEach(({ deleteText = '', insertText = '', offset, operation }) => {
+      for (const { deleteText = '', insertText = '', offset, operation } of differences) {
         const position = {
           start: getPointFromOffset(original, offset),
           end: getPointFromOffset(original, offset + deleteText.length),
@@ -105,7 +105,7 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
             ? file.message(`Replace ${toDelete} with ${toInsert}`, position, 'prettier:replace')
             : file.message(`Insert ${toInsert}`, position.start, 'prettier:insert');
         message.url = 'https://github.com/remcohaszing/remark-prettier';
-      });
+      }
     };
   }
 };
