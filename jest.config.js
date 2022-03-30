@@ -1,8 +1,12 @@
-module.exports = {
-  preset: 'ts-jest',
+export default {
+  preset: 'ts-jest/presets/default-esm',
   globals: {
     'ts-jest': {
-      isolatedModules: true,
+      // IsolatedModules: true,
+      useESM: true,
     },
+  },
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
 };

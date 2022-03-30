@@ -43,16 +43,16 @@ This can also be spcified in a `.remarkrc` file:
 This plugin can also be used with programmatically:
 
 ```js
-import remark from 'remark';
+import { remark } from 'remark';
 import remarkPrettier from 'remark-prettier';
 import { readSync } from 'to-vfile';
 
 remark()
   .use(remarkPrettier)
   .process(readSync('README.md'))
-  .then(({ content, messages }) => {
+  .then(({ messages, value }) => {
     // Formatted content
-    console.log(content);
+    console.log(value);
 
     // Prettier formatting violations
     console.dir(messages);
@@ -68,15 +68,15 @@ used.
 import remarkParse from 'remark-parse';
 import remarkPrettier from 'remark-prettier';
 import { readSync } from 'to-vfile';
-import unified from 'unified';
+import { unified } from 'unified';
 
 unified()
   .use(remarkParse)
   .use(remarkPrettier)
   .process(readSync('README.md'))
-  .then(({ content, messages }) => {
+  .then(({ messages, value }) => {
     // Formatted content
-    console.log(content);
+    console.log(value);
 
     // Prettier formatting violations
     console.dir(messages);

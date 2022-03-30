@@ -1,5 +1,3 @@
-require('ts-node/register');
-
-module.exports = {
-  plugins: ['./src/index.ts'],
+export default {
+  plugins: ['./dist/index.js'],
 };

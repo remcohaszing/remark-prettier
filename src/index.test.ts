@@ -1,11 +1,11 @@
-import * as remark from 'remark';
+import { remark } from 'remark';
 import { VFile } from 'vfile';
 
-import * as remarkPrettier from '.';
+import remarkPrettier from '.';
 
 function representMessages({ messages }: VFile): Partial<VFile['messages'][number]>[] {
-  return messages.map(({ location, reason, ruleId, source, url }) => ({
-    location,
+  return messages.map(({ position, reason, ruleId, source, url }) => ({
+    position,
     reason,
     ruleId,
     source,
@@ -17,7 +17,7 @@ it('should report prettier diff deletions', async () => {
   const result = await remark().use(remarkPrettier).process('\n\n\n');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: {
+      position: {
         end: { column: 1, line: 4, offset: 3 },
         start: { column: 1, line: 1, offset: 0 },
       },
@@ -33,7 +33,7 @@ it('should report prettier diff insertions', async () => {
   const result = await remark().use(remarkPrettier).process('Hello');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
+      position: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
       reason: 'Insert `⏎`',
       ruleId: 'insert',
       source: 'prettier',
@@ -46,7 +46,7 @@ it('should report prettier diff replacements', async () => {
   const result = await remark().use(remarkPrettier).process('\n-  foo');
   expect(representMessages(result)).toStrictEqual([
     {
-      location: {
+      position: {
         end: { column: 7, line: 2, offset: 7 },
         start: { column: 1, line: 1, offset: 0 },
       },
@@ -68,7 +68,7 @@ it('should respect .prettierignore', async () => {
     .use(remarkPrettier)
     .process({
       history: ['dist/ignored.md'],
-      contents: 'ignored\n\n\n\n',
+      value: 'ignored\n\n\n\n',
     });
   expect(representMessages(result)).toStrictEqual([]);
 });
@@ -77,7 +77,7 @@ it('should respect .editorconfig', async () => {
   const result = await remark().use(remarkPrettier).process('X '.repeat(51));
   expect(representMessages(result)).toStrictEqual([
     {
-      location: {
+      position: {
         end: { column: 103, line: 1, offset: 102 },
         start: { column: 100, line: 1, offset: 99 },
       },
@@ -90,7 +90,7 @@ it('should respect .editorconfig', async () => {
 });
 
 it('should format code using prettier', async () => {
-  const { contents } = await remark().use(remarkPrettier).process(`
+  const { value } = await remark().use(remarkPrettier).process(`
 Title
 ===
 
@@ -101,7 +101,7 @@ an unformatted document
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  expect(value).toBe(`# Title
 
 This is an unformatted document
 
@@ -110,7 +110,7 @@ This is an unformatted document
 });
 
 it('should be possible to disable formatting', async () => {
-  const { contents, messages } = await remark().use(remarkPrettier, { format: false }).process(`
+  const { messages, value } = await remark().use(remarkPrettier, { format: false }).process(`
 Title
 ===
 
@@ -122,7 +122,7 @@ by remark-strinfigy
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  expect(value).toBe(`# Title
 
 This document
 will be formatted
@@ -134,7 +134,7 @@ by remark-strinfigy
 });
 
 it('should be possible to disable reporting', async () => {
-  const { contents, messages } = await remark().use(remarkPrettier, { report: false }).process(`
+  const { messages, value } = await remark().use(remarkPrettier, { report: false }).process(`
 Title
 ===
 
@@ -145,7 +145,7 @@ an unformatted document
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  expect(value).toBe(`# Title
 
 This is an unformatted document
 
@@ -155,13 +155,13 @@ This is an unformatted document
 });
 
 it('should support mdx files', async () => {
-  const { contents, messages } = await remark()
+  const { messages, value } = await remark()
     .use(remarkPrettier)
     .process({
       history: ['test.mdx'],
-      contents: '<div>   <span>Hello MDX</span>   </div>',
+      value: '<div>   <span>Hello MDX</span>   </div>',
     });
-  expect(contents).toBe(`<div>
+  expect(value).toBe(`<div>
   {' '}
   <span>Hello MDX</span>{' '}
 </div>
@@ -174,11 +174,11 @@ it('should use the prettier markdown parser for unknown file extensions', async 
     .use(remarkPrettier)
     .process({
       history: ['test.unknown'],
-      contents: 'Hello world\n\n',
+      value: 'Hello world\n\n',
     });
   expect(representMessages(result)).toStrictEqual([
     {
-      location: {
+      position: {
         end: { column: 1, line: 3, offset: 13 },
         start: { column: 1, line: 2, offset: 12 },
       },
@@ -195,11 +195,11 @@ it('should support custom prettier options', async () => {
     .use(remarkPrettier, { options: { endOfLine: 'crlf' } })
     .process({
       history: ['test.unknown'],
-      contents: 'Hello world\n',
+      value: 'Hello world\n',
     });
   expect(representMessages(result)).toStrictEqual([
     {
-      location: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
+      position: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
       reason: 'Insert `␍`',
       ruleId: 'insert',
       source: 'prettier',

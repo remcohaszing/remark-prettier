@@ -1,11 +1,12 @@
 import { resolve } from 'path';
 
-import * as toMarkdown from 'mdast-util-to-markdown';
-import { format, getFileInfo, Options, resolveConfig } from 'prettier';
+import { Root } from 'mdast';
+import { toMarkdown, Options as ToMarkdownOptions } from 'mdast-util-to-markdown';
+import prettier, { Options } from 'prettier';
 import { generateDifferences, showInvisibles } from 'prettier-linter-helpers';
 import { Plugin } from 'unified';
 import { VFile } from 'vfile';
-import * as location from 'vfile-location';
+import { location } from 'vfile-location';
 
 /**
  * A remark plugin for linting and formatting files using Prettier.
@@ -14,7 +15,7 @@ import * as location from 'vfile-location';
  *
  * This also registered a compiler for compiling the AST to markdown.
  */
-const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function remarkPrettier({
+const remarkPrettier: Plugin<[RemarkPrettierOptions?], Root> = function remarkPrettier({
   format: enableFormat = true,
   report = true,
   options = {},
@@ -26,7 +27,7 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
    */
   const getOptions = (file: VFile): Options | undefined => {
     const path = resolve(file.cwd, file.path || 'readme.md');
-    const fileInfo = getFileInfo.sync(path, {
+    const fileInfo = prettier.getFileInfo.sync(path, {
       ignorePath: resolve(file.cwd, '.prettierignore'),
       resolveConfig: true,
     });
@@ -35,22 +36,22 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
     }
 
     return {
-      ...resolveConfig.sync(path, { editorconfig: true }),
+      ...prettier.resolveConfig.sync(path, { editorconfig: true }),
       parser: fileInfo.inferredParser || 'markdown',
       ...options,
     };
   };
 
   if (enableFormat) {
-    this.Compiler = (tree, file) => {
+    this.Compiler = (tree: Root, file) => {
       const prettierOptions = getOptions(file);
       // This is basically all remark-stringfy does, except we don’t accept custom toMarkdown
       // options.
       const markdown = toMarkdown(tree, {
-        ...(this.data('settings') as toMarkdown.Options),
-        extensions: (this.data('toMarkdownExtensions') || []) as toMarkdown.Options[],
+        ...(this.data('settings') as ToMarkdownOptions),
+        extensions: (this.data('toMarkdownExtensions') || []) as ToMarkdownOptions[],
       });
-      return prettierOptions ? format(markdown, prettierOptions) : markdown;
+      return prettierOptions ? prettier.format(markdown, prettierOptions) : markdown;
     };
   }
 
@@ -62,7 +63,7 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
         return;
       }
       const original = String(file);
-      const formatted = format(original, prettierOptions);
+      const formatted = prettier.format(original, prettierOptions);
       if (original === formatted) {
         return;
       }
@@ -90,31 +91,28 @@ const remarkPrettier: Plugin<[remarkPrettier.RemarkPrettierOptions?]> = function
   }
 };
 
-// eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-redeclare
-declare namespace remarkPrettier {
-  export interface RemarkPrettierOptions {
-    /**
-     * Whether or not to format files using Prettier.
-     *
-     * @default true
-     */
-    format?: boolean;
+export interface RemarkPrettierOptions {
+  /**
+   * Whether or not to format files using Prettier.
+   *
+   * @default true
+   */
+  format?: boolean;
 
-    /**
-     * Additional Prettier options.
-     *
-     * These options will override the values in `.editorconfig` and `.prettierrc`. It’s typically
-     * not recommended to use this.
-     */
-    options?: Options;
+  /**
+   * Additional Prettier options.
+   *
+   * These options will override the values in `.editorconfig` and `.prettierrc`. It’s typically not
+   * recommended to use this.
+   */
+  options?: Options;
 
-    /**
-     * Whether or not to report Prettier formatting violations.
-     *
-     * @default true
-     */
-    report?: boolean;
-  }
+  /**
+   * Whether or not to report Prettier formatting violations.
+   *
+   * @default true
+   */
+  report?: boolean;
 }
 
-export = remarkPrettier;
+export default remarkPrettier;
