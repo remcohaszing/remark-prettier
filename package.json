@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "prepack": "tsc --noEmit false",
+    "start": "tsx watch index.test.ts",
     "test": "tsx index.test.ts"
   },
   "dependencies": {
