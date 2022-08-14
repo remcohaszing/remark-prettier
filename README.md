@@ -106,3 +106,7 @@ behaviour can be disabled by setting this option to `false`. (Default `true`)
 - [prettier](https://prettier.io)
 - [remark](https://github.com/remarkjs/remark)
 - [stylelint-prettier](https://github.com/prettier/stylelint-prettier)
+
+## License
+
+[MIT](LICENSE.md) © [Remco Haszing](https://github.com/remcohaszing)
