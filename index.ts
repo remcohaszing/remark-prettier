@@ -110,6 +110,7 @@ const remarkPrettier: Plugin<[RemarkPrettierOptions?], Root> = function remarkPr
             ? file.message(`Replace ${toDelete} with ${toInsert}`, position, 'prettier:replace')
             : file.message(`Insert ${toInsert}`, position.start, 'prettier:insert');
         message.url = 'https://github.com/remcohaszing/remark-prettier';
+        message.expected = [insertText];
       }
     };
   }

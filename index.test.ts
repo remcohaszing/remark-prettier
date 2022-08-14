@@ -12,7 +12,8 @@ import remarkPrettier from './index.js';
  * @returns The messages in a format that can be compared by uvu.
  */
 function representMessages({ messages }: VFile): Partial<VFile['messages'][number]>[] {
-  return messages.map(({ position, reason, ruleId, source, url }) => ({
+  return messages.map(({ expected, position, reason, ruleId, source, url }) => ({
+    expected,
     position,
     reason,
     ruleId,
@@ -25,6 +26,7 @@ test('should report prettier diff deletions', async () => {
   const result = await remark().use(remarkPrettier).process('\n\n\n');
   assert.equal(representMessages(result), [
     {
+      expected: [''],
       position: {
         end: { column: 1, line: 4, offset: 3 },
         start: { column: 1, line: 1, offset: 0 },
@@ -41,6 +43,7 @@ test('should report prettier diff insertions', async () => {
   const result = await remark().use(remarkPrettier).process('Hello');
   assert.equal(representMessages(result), [
     {
+      expected: ['\n'],
       position: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
       reason: 'Insert `⏎`',
       ruleId: 'insert',
@@ -54,6 +57,7 @@ test('should report prettier diff replacements', async () => {
   const result = await remark().use(remarkPrettier).process('\n-  foo');
   assert.equal(representMessages(result), [
     {
+      expected: ['- foo\n'],
       position: {
         end: { column: 7, line: 2, offset: 7 },
         start: { column: 1, line: 1, offset: 0 },
@@ -85,6 +89,7 @@ test('should respect .editorconfig', async () => {
   const result = await remark().use(remarkPrettier).process('X '.repeat(51));
   assert.equal(representMessages(result), [
     {
+      expected: ['\nX\n'],
       position: {
         end: { column: 103, line: 1, offset: 102 },
         start: { column: 100, line: 1, offset: 99 },
@@ -198,6 +203,7 @@ test('should use the prettier markdown parser for unknown file extensions', asyn
     });
   assert.equal(representMessages(result), [
     {
+      expected: [''],
       position: {
         end: { column: 1, line: 3, offset: 13 },
         start: { column: 1, line: 2, offset: 12 },
@@ -219,6 +225,7 @@ test('should support custom prettier options', async () => {
     });
   assert.equal(representMessages(result), [
     {
+      expected: ['\r'],
       position: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
       reason: 'Insert `␍`',
       ruleId: 'insert',
