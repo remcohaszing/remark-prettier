@@ -1,11 +1,19 @@
-import * as remark from 'remark';
+import { remark } from 'remark';
+import { test } from 'uvu';
+import * as assert from 'uvu/assert';
 import { VFile } from 'vfile';
 
-import * as remarkPrettier from '.';
+import remarkPrettier from './index.js';
 
+/**
+ * Represent vfile messages in a format that can be compared by uvu.
+ *
+ * @param vfile The vfile whose messages to represent.
+ * @returns The messages in a format that can be compared by uvu.
+ */
 function representMessages({ messages }: VFile): Partial<VFile['messages'][number]>[] {
-  return messages.map(({ location, reason, ruleId, source, url }) => ({
-    location,
+  return messages.map(({ position, reason, ruleId, source, url }) => ({
+    position,
     reason,
     ruleId,
     source,
@@ -13,11 +21,11 @@ function representMessages({ messages }: VFile): Partial<VFile['messages'][numbe
   }));
 }
 
-it('should report prettier diff deletions', async () => {
+test('should report prettier diff deletions', async () => {
   const result = await remark().use(remarkPrettier).process('\n\n\n');
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: {
+      position: {
         end: { column: 1, line: 4, offset: 3 },
         start: { column: 1, line: 1, offset: 0 },
       },
@@ -29,11 +37,11 @@ it('should report prettier diff deletions', async () => {
   ]);
 });
 
-it('should report prettier diff insertions', async () => {
+test('should report prettier diff insertions', async () => {
   const result = await remark().use(remarkPrettier).process('Hello');
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
+      position: { end: { column: null, line: null }, start: { column: 6, line: 1, offset: 5 } },
       reason: 'Insert `⏎`',
       ruleId: 'insert',
       source: 'prettier',
@@ -42,11 +50,11 @@ it('should report prettier diff insertions', async () => {
   ]);
 });
 
-it('should report prettier diff replacements', async () => {
+test('should report prettier diff replacements', async () => {
   const result = await remark().use(remarkPrettier).process('\n-  foo');
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: {
+      position: {
         end: { column: 7, line: 2, offset: 7 },
         start: { column: 1, line: 1, offset: 0 },
       },
@@ -58,26 +66,26 @@ it('should report prettier diff replacements', async () => {
   ]);
 });
 
-it('should not report anything if there are no differences', async () => {
+test('should not report anything if there are no differences', async () => {
   const result = await remark().use(remarkPrettier).process('This is ok\n');
-  expect(representMessages(result)).toStrictEqual([]);
+  assert.equal(representMessages(result), []);
 });
 
-it('should respect .prettierignore', async () => {
+test('should respect .prettierignore', async () => {
   const result = await remark()
     .use(remarkPrettier)
     .process({
       history: ['dist/ignored.md'],
-      contents: 'ignored\n\n\n\n',
+      value: 'ignored\n\n\n\n',
     });
-  expect(representMessages(result)).toStrictEqual([]);
+  assert.equal(representMessages(result), []);
 });
 
-it('should respect .editorconfig', async () => {
+test('should respect .editorconfig', async () => {
   const result = await remark().use(remarkPrettier).process('X '.repeat(51));
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: {
+      position: {
         end: { column: 103, line: 1, offset: 102 },
         start: { column: 100, line: 1, offset: 99 },
       },
@@ -89,8 +97,8 @@ it('should respect .editorconfig', async () => {
   ]);
 });
 
-it('should format code using prettier', async () => {
-  const { contents } = await remark().use(remarkPrettier).process(`
+test('should format code using prettier', async () => {
+  const { value } = await remark().use(remarkPrettier).process(`
 Title
 ===
 
@@ -101,16 +109,19 @@ an unformatted document
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  assert.equal(
+    value,
+    `# Title
 
 This is an unformatted document
 
 - including list items
-`);
+`,
+  );
 });
 
-it('should be possible to disable formatting', async () => {
-  const { contents, messages } = await remark().use(remarkPrettier, { format: false }).process(`
+test('should be possible to disable formatting', async () => {
+  const { messages, value } = await remark().use(remarkPrettier, { format: false }).process(`
 Title
 ===
 
@@ -122,19 +133,22 @@ by remark-strinfigy
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  assert.equal(
+    value,
+    `# Title
 
 This document
 will be formatted
 by remark-strinfigy
 
 *   including list items
-`);
-  expect(messages.length).toBeGreaterThan(0);
+`,
+  );
+  assert.ok(messages.length > 0);
 });
 
-it('should be possible to disable reporting', async () => {
-  const { contents, messages } = await remark().use(remarkPrettier, { report: false }).process(`
+test('should be possible to disable reporting', async () => {
+  const { messages, value } = await remark().use(remarkPrettier, { report: false }).process(`
 Title
 ===
 
@@ -145,40 +159,46 @@ an unformatted document
 
 *   including list items
   `);
-  expect(contents).toBe(`# Title
+  assert.equal(
+    value,
+    `# Title
 
 This is an unformatted document
 
 - including list items
-`);
-  expect(messages).toHaveLength(0);
+`,
+  );
+  assert.equal(messages, []);
 });
 
-it('should support mdx files', async () => {
-  const { contents, messages } = await remark()
+test('should support mdx files', async () => {
+  const { messages, value } = await remark()
     .use(remarkPrettier)
     .process({
       history: ['test.mdx'],
-      contents: '<div>   <span>Hello MDX</span>   </div>',
+      value: '<div>   <span>Hello MDX</span>   </div>',
     });
-  expect(contents).toBe(`<div>
+  assert.equal(
+    value,
+    `<div>
   {' '}
   <span>Hello MDX</span>{' '}
 </div>
-`);
-  expect(messages.length).toBeGreaterThan(0);
+`,
+  );
+  assert.ok(messages.length > 0);
 });
 
-it('should use the prettier markdown parser for unknown file extensions', async () => {
+test('should use the prettier markdown parser for unknown file extensions', async () => {
   const result = await remark()
     .use(remarkPrettier)
     .process({
       history: ['test.unknown'],
-      contents: 'Hello world\n\n',
+      value: 'Hello world\n\n',
     });
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: {
+      position: {
         end: { column: 1, line: 3, offset: 13 },
         start: { column: 1, line: 2, offset: 12 },
       },
@@ -190,16 +210,16 @@ it('should use the prettier markdown parser for unknown file extensions', async 
   ]);
 });
 
-it('should support custom prettier options', async () => {
+test('should support custom prettier options', async () => {
   const result = await remark()
     .use(remarkPrettier, { options: { endOfLine: 'crlf' } })
     .process({
       history: ['test.unknown'],
-      contents: 'Hello world\n',
+      value: 'Hello world\n',
     });
-  expect(representMessages(result)).toStrictEqual([
+  assert.equal(representMessages(result), [
     {
-      location: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
+      position: { end: { column: null, line: null }, start: { column: 12, line: 1, offset: 11 } },
       reason: 'Insert `␍`',
       ruleId: 'insert',
       source: 'prettier',
@@ -207,3 +227,5 @@ it('should support custom prettier options', async () => {
     },
   ]);
 });
+
+test.run();
