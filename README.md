@@ -52,9 +52,9 @@ import { readSync } from 'to-vfile';
 remark()
   .use(remarkPrettier)
   .process(readSync('README.md'))
-  .then(({ content, messages }) => {
+  .then(({ messages, value }) => {
     // Formatted content
-    console.log(content);
+    console.log(value);
 
     // Prettier formatting violations
     console.dir(messages);
@@ -76,9 +76,9 @@ unified()
   .use(remarkParse)
   .use(remarkPrettier)
   .process(readSync('README.md'))
-  .then(({ content, messages }) => {
+  .then(({ messages, value }) => {
     // Formatted content
-    console.log(content);
+    console.log(value);
 
     // Prettier formatting violations
     console.dir(messages);
