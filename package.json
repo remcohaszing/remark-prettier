@@ -29,6 +29,9 @@
     "remark-plugin",
     "unified"
   ],
+  "funding": {
+    "url": "https://github.com/sponsors/remcohaszing"
+  },
   "scripts": {
     "prepack": "tsc --noEmit false",
     "start": "tsx watch index.test.ts",
