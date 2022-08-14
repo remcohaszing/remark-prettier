@@ -5,3 +5,4 @@ node_modules/
 *.js
 *.log
 *.tgz
+.c8rc.json
