@@ -1,13 +1,15 @@
 # Remark Prettier
 
-[![github actions][github actions badge]][github actions] [![codecov][codecov badge]][codecov]
-[![npm][npm badge]][npm] [![prettier][prettier badge]][prettier] [![jest][jest badge]][jest]
+[![github actions](https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml/badge.svg)](https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/remcohaszing/remark-prettier/branch/master/graph/badge.svg)](https://codecov.io/gh/remcohaszing/remark-prettier)
+[![npm](https://img.shields.io/npm/v/remark-prettier)](https://www.npmjs.com/package/remark-prettier)
+[![prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io)
 
-> Check and format markdown using Prettier as a [remark][] plugin
+Check and format markdown using Prettier as a [remark](https://github.com/remarkjs/remark) plugin
 
 ## Installation
 
-`remark-prettier` has a peer dependency on [prettier][]
+`remark-prettier` has a peer dependency on [prettier](https://prettier.io)
 
 ```sh
 npm install prettier remark-prettier
@@ -100,23 +102,7 @@ behaviour can be disabled by setting this option to `false`. (Default `true`)
 
 ## See also
 
-- [eslint-plugin-prettier][]
-- [prettier][]
-- [remark][]
-- [stylelint-prettier][]
-
-[codecov badge]: https://codecov.io/gh/remcohaszing/remark-prettier/branch/master/graph/badge.svg
-[codecov]: https://codecov.io/gh/remcohaszing/remark-prettier
-[eslint-plugin-prettier]: https://github.com/prettier/eslint-plugin-prettier
-[estree]: https://github.com/estree/estree
-[github actions badge]:
-  https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml/badge.svg
-[github actions]: https://github.com/remcohaszing/remark-prettier/actions/workflows/ci.yml
-[jest badge]: https://jestjs.io/img/jest-badge.svg
-[jest]: https://jestjs.io
-[npm badge]: https://img.shields.io/npm/v/remark-prettier
-[npm]: https://www.npmjs.com/package/remark-prettier
-[prettier badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg
-[prettier]: https://prettier.io
-[remark]: https://github.com/remarkjs/remark
-[stylelint-prettier]: https://github.com/prettier/stylelint-prettier
+- [eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)
+- [prettier](https://prettier.io)
+- [remark](https://github.com/remarkjs/remark)
+- [stylelint-prettier](https://github.com/prettier/stylelint-prettier)
