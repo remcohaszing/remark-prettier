@@ -7,6 +7,10 @@
 
 Check and format markdown using Prettier as a [remark](https://github.com/remarkjs/remark) plugin
 
+> **Warning** This project has been deprecated in favor of
+> [`unified-consistency`](https://github.com/remcohaszing/unified-consistency) and
+> [`unified-prettier`](https://github.com/remcohaszing/unified-prettier).
+
 ## Installation
 
 `remark-prettier` has a peer dependency on [prettier](https://prettier.io)
